@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,8 @@ public class DipendenteService {
     private DipendentiRepository dipendentiRepository;
     @Autowired
     Cloudinary cloudinary;
+    @Autowired
+    PasswordEncoder bCrypt;
 
     //FIND ALL CON PAGINAZIONE
     public Page<Dipendente> findAll(int page,int size,String sortBy){
@@ -45,7 +48,7 @@ public class DipendenteService {
             throw new BadRequestException("L'username: "+body.username()+" è già in uso!");
         });
 
-        Dipendente dipendente=new Dipendente(body.username(), body.nome(), body.cognome(),body.email(), body.password(),
+        Dipendente dipendente=new Dipendente(body.username(), body.nome(), body.cognome(),body.email(), bCrypt.encode(body.password()),
                 "https://ui-avatars.com/api/?name="+body.nome()+"+"+body.cognome() );
 
         return this.dipendentiRepository.save(dipendente);

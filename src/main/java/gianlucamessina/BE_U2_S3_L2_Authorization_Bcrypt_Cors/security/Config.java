@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -21,5 +23,10 @@ public class Config {
         httpSecurity.sessionManagement(http->http.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); //tolgo le sessioni perché con JWT non si utilizzano
         httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/**").permitAll()); //evito di ricevere 401 su ogni richiesta
         return httpSecurity.build();
+    }
+
+    @Bean
+    PasswordEncoder getBCrypt(){
+        return new BCryptPasswordEncoder(11);
     }
 }

@@ -1,5 +1,6 @@
 package gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @ToString
 @Entity
 @Table(name = "dipendenti")
+@JsonIgnoreProperties({"password", "role", "authorities", "enabled", "accountNonLocked", "accountNonExpired", "credentialsNonExpired"})
 public class Dipendente implements UserDetails {
     @Id
     @GeneratedValue
