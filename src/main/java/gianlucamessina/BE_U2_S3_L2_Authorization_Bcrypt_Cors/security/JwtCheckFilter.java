@@ -1,21 +1,29 @@
 package gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.security;
 
+import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.entities.Dipendente;
 import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.exceptions.UnauthorizedException;
+import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.services.DipendenteService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class JwtCheckFilter extends OncePerRequestFilter {
     @Autowired
     JWTTools jwtTools;
+    @Autowired
+    DipendenteService dipendenteService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,6 +41,18 @@ public class JwtCheckFilter extends OncePerRequestFilter {
         //3. verifico se il token è stato manipolato
         jwtTools.verifyToken(token);
 
+        //4. per abilitare l'autorizzazione devo informare spring security su chi sia l'utente che sta effettuando la richiesta
+        //per controllare il ruolo
+
+        //CERCO L'UTENTE CHE STA EFFETTUANDO LA RCICHIESTA TRAMITE ID NEL TOKEN
+        String id= jwtTools.extractFromToken(token);
+        Dipendente dipendenteCorrente=this.dipendenteService.findById(UUID.fromString(id));
+
+        //una volta trovato l'utente lo posso associare al security context, vale a dire associare l'utente autenticato alla richiesta corrente
+        Authentication authentication=new UsernamePasswordAuthenticationToken(dipendenteCorrente,null,dipendenteCorrente.getAuthorities());
+        //il terzo parametro mi serve per utilizzare i @PreAuthorize perchè ci ritorna la lista di ruoli del dipendente corrente
+        //quindi associo il dipendente autenticato al context
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request,response);
     }
 
