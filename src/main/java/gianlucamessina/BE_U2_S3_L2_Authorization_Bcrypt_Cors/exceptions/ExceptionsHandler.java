@@ -2,6 +2,7 @@ package gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.exceptions;
 
 import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.payloads.ErrorsResponseDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,6 +36,12 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorsResponseDTO handleNotFound(UnauthorizedException e){
         return new ErrorsResponseDTO(e.getMessage(),LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403
+    public ErrorsResponseDTO handleForbidden(AuthorizationDeniedException ex) {
+        return new ErrorsResponseDTO("Non hai i permessi per accedere", LocalDateTime.now());
     }
 
 

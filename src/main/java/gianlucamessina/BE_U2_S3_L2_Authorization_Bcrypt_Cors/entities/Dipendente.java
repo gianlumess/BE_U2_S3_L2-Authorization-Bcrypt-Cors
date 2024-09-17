@@ -48,6 +48,6 @@ public class Dipendente implements UserDetails {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
-    
+
 
 }
