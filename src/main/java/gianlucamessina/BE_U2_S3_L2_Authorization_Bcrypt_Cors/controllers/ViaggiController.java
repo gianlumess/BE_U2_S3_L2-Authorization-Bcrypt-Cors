@@ -8,6 +8,7 @@ import gianlucamessina.BE_U2_S3_L2_Authorization_Bcrypt_Cors.services.ViaggioSer
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ public class ViaggiController {
     //POST (http://localhost:3001/viaggi)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Viaggio save(@RequestBody @Validated NewViaggioDTO body, BindingResult validation){
         if(validation.hasErrors()){
             String messages=validation.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage()).collect(Collectors.joining(". "));
@@ -51,6 +53,7 @@ public class ViaggiController {
 
     //PUT
     @PutMapping("/{viaggioId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Viaggio findByIdAndUpdate(@PathVariable UUID viaggioId, @RequestBody @Validated NewViaggioDTO body){
         return this.viaggioService.findByIdAndUpdate(viaggioId,body);
     }
@@ -58,12 +61,14 @@ public class ViaggiController {
     //DELETE
     @DeleteMapping("/{viaggioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void findByIdAndDelete(@PathVariable UUID viaggioId){
         this.viaggioService.findByIdAndDelete(viaggioId);
     }
 
     //MODIFICA STATO VIAGGIO
     @PatchMapping("/{viaggioId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Viaggio editStatus(@PathVariable UUID viaggioId,@RequestBody @Validated NewViaggioStatoDTO body){
         return this.viaggioService.editStatus(viaggioId,body);
     }

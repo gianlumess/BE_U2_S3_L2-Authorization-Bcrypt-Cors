@@ -21,7 +21,7 @@ public class PrenotazioniController {
     @Autowired
     private PrenotazioneService prenotazioneService;
 
-    //GET DELLA LISTA DI PRENOTAZIOI (http://localhost:3001/prenotazioni)
+    //GET DELLA LISTA DI PRENOTAZIONI (http://localhost:3001/prenotazioni)
     @GetMapping
     public Page<Prenotazione> findAll(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "15") int size,
