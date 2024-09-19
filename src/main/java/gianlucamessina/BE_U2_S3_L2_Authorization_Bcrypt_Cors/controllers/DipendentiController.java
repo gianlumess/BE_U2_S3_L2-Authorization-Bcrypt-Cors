@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -59,8 +60,8 @@ public class DipendentiController {
     //PUT
     @PutMapping("/{dipendenteId}")
     @PreAuthorize("hasAuthority('ADMIN')") //solo gli admin possono modificare un utente
-    public Dipendente findByIdAndUpdate(@PathVariable UUID dipendenteId, @RequestBody @Validated NewDipendenteDTO body){
-        return this.dipendenteService.findByIdAndUpdate(dipendenteId,body);
+    public Dipendente findByIdAndUpdate(@PathVariable Dipendente dipendente, @RequestBody @Validated NewDipendenteDTO body){
+        return this.dipendenteService.findByIdAndUpdate(dipendente.getId(),body);
     }
 
     //DELETE
@@ -75,5 +76,23 @@ public class DipendentiController {
     @PatchMapping("/{dipendenteId}/pic")
     public Dipendente uploadProfilePic(@PathVariable UUID dipendenteId, @RequestParam("pic")MultipartFile pic) throws IOException {
         return this.dipendenteService.uploadProfilePicture(dipendenteId,pic);
+    }
+
+    //ENDPOINTS ACCESSIBILI CON DATI ESCLUSIVAMENTE APPARTENENTI A CHI EFFETTUA LA RICHIESTA
+
+    @GetMapping("/me")
+    public Dipendente getMyProfile(@AuthenticationPrincipal Dipendente dipendente){
+        // Tramite @AuthenticationPrincipal posso accedere ai dati dell'utente che sta effettuando la richiesta
+        return dipendente;
+    }
+
+    @PutMapping("/me")
+    public Dipendente updateMyProfile(@AuthenticationPrincipal Dipendente dipendente,@RequestBody @Validated NewDipendenteDTO body){
+        return this.dipendenteService.findByIdAndUpdate(dipendente.getId(),body);
+    }
+
+    @DeleteMapping("/me")
+    public void deleteMyProfile(@AuthenticationPrincipal Dipendente dipendente){
+        this.dipendenteService.findByIdAndDelete(dipendente.getId());
     }
 }
